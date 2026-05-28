@@ -1,29 +1,15 @@
 package com.example.flightsearch.data
 
+import androidx.room3.Dao
 import androidx.room3.Query
 import kotlinx.coroutines.flow.Flow
 
+@Dao
 interface AirportDao {
 
-    @Query("""
-       SELECT * FROM airport
-       WHERE name LIKE "%" 
-       OR iata_code LIKE "%"
-       ORDER BY passengers DESC
-    """)
-    fun searchAirports(searchText: String): Flow<List<Airport>>
+    @Query("SELECT * FROM airport WHERE name LIKE :name OR iata_code LIKE :name ORDER BY passengers DESC")
+    fun getAirportsByName(name: String): Flow<List<AirportEntity>>
 
-    @Query("""
-        SELECT * FROM airport
-        WHERE iata_code != :iataCode
-        ORDER BY passengers DESC
-    """)
-    fun getDestinationAirport(iatacode: String) : Flow<List<Airport>>
-
-    @Query("""
-          SELECT * FROM airport
-          WHERE iata_code = :iataCode
-          LIMIT 1
-    """)
-    suspend fun getAirportCode(iatacode: String): Airport?
+    @Query("SELECT * FROM airport ORDER BY passengers DESC")
+    fun getAll(): Flow<List<AirportEntity>>
 }

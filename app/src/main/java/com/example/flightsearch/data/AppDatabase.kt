@@ -5,28 +5,37 @@ import androidx.room3.Database
 import androidx.room3.Room
 import androidx.room3.RoomDatabase
 
-@Database(entities = [Airport::class], version = 1)
-abstract class AppDatabase: RoomDatabase() {
+@Database(
+    version = 1,
+    entities = [
+        AirportEntity::class,
+        FavoriteEntity::class,
+    ],
+    exportSchema = false,
+)
+abstract class FlightSearchDatabase : RoomDatabase() {
+
     abstract fun airportDao(): AirportDao
 
-    companion object{
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
+    abstract fun favoriteDao(): FavoriteDao
 
-        fun getDatabase(context: Context) : AppDatabase {
-            return INSTANCE ?:synchronized(this) {
+    companion object {
+
+        @Volatile
+        private var Instance: FlightSearchDatabase? = null
+
+        fun getDatabase(context: Context): FlightSearchDatabase {
+            return Instance ?: synchronized(this) {
                 Room.databaseBuilder(
                     context,
-                    AppDatabase::class.java,
-                    "app_database"
+                    FlightSearchDatabase::class.java,
+                    "flight_search_database",
                 )
                     .createFromAsset("database/FlightSearch.db")
-                    .fallbackToDestructiveMigration()
                     .build()
-                    .also {
-                        INSTANCE = it
-                    }
+                    .also { Instance = it }
             }
         }
     }
+
 }
